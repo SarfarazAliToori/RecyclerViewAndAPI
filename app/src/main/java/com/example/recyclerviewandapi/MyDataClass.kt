@@ -6,5 +6,5 @@ data class MyDataClass(
     var country : String,
     var province : String,
     var alphaCode : String,
-    var webPage : String
+    var domain : String
 )

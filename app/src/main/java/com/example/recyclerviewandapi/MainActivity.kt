@@ -2,7 +2,9 @@ package com.example.recyclerviewandapi
 
 import android.Manifest
 import android.app.DownloadManager
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +12,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +20,11 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.FileNotFoundException
+import com.kaopiz.kprogresshud.KProgressHUD
+
+
+
 
 class MainActivity : AppCompatActivity(), MyOnClickItemViewListener {
 
@@ -26,6 +34,7 @@ class MainActivity : AppCompatActivity(), MyOnClickItemViewListener {
     }
 
     lateinit var myAddapter : MyAddapter
+    var hud : KProgressHUD? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +78,11 @@ class MainActivity : AppCompatActivity(), MyOnClickItemViewListener {
     }
 
     private fun loadDataFromApi() {
+        val progress = KProgressHUD.create(this)
+            .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+            .setLabel("Please wait")
+            .setCancellable(true)
+            .show()
         //val queue = Volley.newRequestQueue(this)
         val url = "http://universities.hipolabs.com/search?country=pakistan"
 
@@ -81,12 +95,13 @@ class MainActivity : AppCompatActivity(), MyOnClickItemViewListener {
                     myJsonObj.getString("country"),
                     myJsonObj.getString("state-province"),
                     myJsonObj.getString("alpha_two_code"),
-                    myJsonObj.getString("web_pages")
+                    myJsonObj.getString("domains")
                 )
                 myArrayListOfDataClass.add(myDataClass)
             }
             myAddapter.updateData(myArrayListOfDataClass)
 
+                progress.dismiss()
         },{
             Log.d("error", it.localizedMessage)
         })
@@ -97,6 +112,35 @@ class MainActivity : AppCompatActivity(), MyOnClickItemViewListener {
 
     override fun onClickedListener(items: MyDataClass) {
         Toast.makeText(this, "${items.uniTitle}", Toast.LENGTH_SHORT).show()
+
+//        val myDomain: String = items.domain
+//        val finalDomain = myDomain.substring(2,myDomain.length-2)
+//        val url="http://$finalDomain/"
+//        val openURL = Intent(Intent.ACTION_VIEW, Uri.parse("$url"))
+//        val progress = KProgressHUD.create(peekAvailableContext())
+//            .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+//            .setLabel("Please wait")
+//            .setCancellable(true)
+//            .show()
+//        startActivity(openURL)
+//
+//        progress.dismiss()
+
+        // using library open new browser tab
+        try {
+            val progress = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("Please wait")
+                .setCancellable(true)
+                .show()
+            val builder= CustomTabsIntent.Builder().build()
+            val myDomain: String = items.domain
+            val finalDomain = myDomain.substring(2,myDomain.length-2)
+            val url="http://$finalDomain/"
+            builder.launchUrl(this, Uri.parse(url))
+            progress.dismiss()
+
+        }catch (e: FileNotFoundException) { e.printStackTrace() }
     }
 
 }

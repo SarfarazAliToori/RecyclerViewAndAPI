@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
 class MyAddapter( private val listener: MyOnClickItemViewListener) : RecyclerView.Adapter<MyAddapter.MyViewHolder>() {
@@ -21,10 +22,31 @@ class MyAddapter( private val listener: MyOnClickItemViewListener) : RecyclerVie
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val hh = arrayList[position]
-        holder.uniTitle.text = hh.uniTitle
-        holder.contry.text = hh.country
-        holder.province.text = hh.province
-        holder.alphaCode.text = hh.alphaCode
+        //holder.uniTitle.text = hh.uniTitle
+        //holder.contry.text = hh.country
+        //holder.province.text = hh.province
+        //holder.alphaCode.text = hh.alphaCode
+
+        if (hh.uniTitle.equals("null")) {
+            holder.uniTitle.text = "N/A"
+        } else {
+            holder.uniTitle.text = hh.uniTitle
+        }
+        if (hh.country.equals("null")) {
+            holder.contry.text = "N/A"
+        } else {
+            holder.contry.text = "Country: ${hh.country}"
+        }
+        if (hh.province == "null") {
+            holder.province.text = "N/A"
+        } else {
+            holder.province.text = "Provine: ${hh.province}"
+        }
+        if (hh.alphaCode.equals("null")) {
+            holder.alphaCode.text = "N/A"
+        } else {
+            holder.alphaCode.text = "Alpha Code: ${hh.alphaCode}"
+        }
     }
 
     fun updateData(updatedItem: ArrayList<MyDataClass>) {
